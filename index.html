@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoof & Rein Random Generator</title>
+    <style>
+        /* CSS styles copied from the initial_code_canvas */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1e1e1e;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Use min-height for better content handling */
+            overflow-y: auto;
+        }
+        .container {
+            background: #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px auto; /* Add margin for smaller screens */
+        }
+        .branding {
+            text-align: center;
+            margin-bottom: 20px; /* Add spacing below the logo */
+        }
+
+        .branding-logo {
+            max-width: 150px; /* Set the maximum width for the logo */
+            height: auto; /* Maintain aspect ratio */
+            display: inline-block; /* Ensure it centers properly */
+            margin: 0 auto; /* Center the logo */
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffdd57;
+        }
+        button {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px; /* Add some margin between buttons */
+        }
+        button:hover {
+            background: #e65c54;
+        }
+        .details-output { /* Renamed from drink-details */
+            margin-top: 20px;
+            background: #444;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: left;
+        }
+        .details-output p {
+            margin: 5px 0;
+        }
+		 label {
+			margin-right: 10px;
+		}
+		select, input[type="checkbox"] {
+			margin-left: 5px;
+		}
+		.controls-section { /* Added a class for clarity */
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		.scrollable-box {
+			max-height: 550px;
+			overflow-y: auto;
+			border: 1px solid #555; /* Softer border */
+			padding: 10px;
+			background: linear-gradient(180deg, #222, #333); /* Gradient background */
+			border-radius: 8gpx; /* Rounded corners */
+		}
+
+		.scrollable-box li:nth-child(even) {
+			background: #444; /* Slightly lighter for alternate rows */
+		}
+		.scrollable-box li strong {
+			color: #ffdd57; /* Highlight item names */
+		}
+		.scrollable-box li {
+			padding: 10px;
+			border-radius: 5px;
+			text-align: left; /* Ensure individual list items are left-aligned */
+			margin-bottom: 10px; /* Add spacing between items */
+		}
+        /* Added styles for better mobile responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            button {
+                width: 100%; /* Make buttons full width on small screens */
+                margin-bottom: 10px; /* Add space below buttons */
+            }
+             .controls-section {
+                flex-direction: column; /* Stack controls vertically on small screens */
+                align-items: center;
+             }
+             label, select, input[type="checkbox"] {
+                margin: 5px 0; /* Adjust margins for stacked elements */
+             }
+        }
+
+        /* Styles for stat block */
+        .stat-block {
+            margin-top: 20px;
+            background: #555; /* Darker background for contrast */
+            border-radius: 5px;
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #666;
+        }
+
+        .stat-block h3 {
+            font-size: 1.2rem;
+            color: #ffdd57;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #666;
+            padding-bottom: 5px;
+        }
+
+        .stat-block p {
+            margin-bottom: 8px;
+        }
+
+         .stat-block .abilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Responsive grid */
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #666;
+        }
+
+        .stat-block .ability {
+            text-align: center;
+            background: #444;
+            padding: 10px 5px;
+            border-radius: 5px;
+        }
+
+        .stat-block .ability strong {
+            display: block;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+         .stat-block .ability span {
+             font-size: 0.9em;
+             color: #ccc;
+         }
+
+         .stat-block ul {
+             list-style: disc;
+             margin-left: 20px;
+             margin-top: 10px;
+         }
+
+         .stat-block li {
+             margin-bottom: 5px;
+         }
+
+         .stat-block li strong {
+             color: #fff; /* White for trait/action names */
+         }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="branding">
+            <a href="https://www.patreon.com/DungeonBrew" target="_blank">
+                <img src="Updated Logo.png" alt="Company Logo" class="branding-logo">
+            </a>
+        </div>
+        <h1>HOOF & REIN</h1>
+        <h1>Random Horse Generator</h1>
+
+		<div class="controls-section">
+			<label for="horseGender">Choose Gender:</label>
+            <select id="horseGender">
+                <option value="roll">Roll Random</option>
+                <option value="Gelding">Gelding</option>
+                <option value="Mare">Mare</option>
+                <option value="Stallion">Stallion</option>
+            </select>
+
+            </div>
+
+		<button id="generate-horse">Generate Horse</button>
+		<button id="saveHorse">Save Horse</button>
+		<button id="downloadList">Download Horse List</button>
+
+		<div class="details-output" id="horseDetails">
+			<h2 id="horseName" style="font-size: 1.5rem; color: #ffdd57; margin: 10px 0;"></h2>
+            <p><strong>Gender:</strong> <span id="gender"></span></p>
+            <p><strong>Mount Type:</strong> <span id="mountType"></span></p>
+            <p><strong>Appearance:</strong> <span id="appearance"></span></p>
+            <p><strong>Age:</strong> <span id="age"></span></p>
+            <p><strong>Traits:</strong> <span id="traits"></span></p>
+             <p><strong>Cost Modifier:</strong> <span id="costModifier"></span></p>
+             <p><strong>Calculated Cost:</strong> <span id="calculatedCost"></span></p>
+             <div id="statBlockOutput">
+                 </div>
+            </div>
+
+		<h3>Saved Horses:</h3>
+		<div class="scrollable-box">
+			<ul id="savedHorsesList" style="list-style-type: none; padding: 0;"></ul>
+		</div>
+
+	</div>
+
+    <script>
+        // --- Currency Conversion Function ---
+        function convertToCurrency(gp) {
+            if (isNaN(gp)) {
+                return "N/A";
+            }
+
+            const gold = Math.floor(gp);
+            const remainder = gp - gold;
+            const silver = Math.floor(remainder * 10);
+            const copper = Math.round((remainder * 100) % 10);
+
+            let currencyString = "";
+            if (gold > 0) {
+                currencyString += `${gold} gp`;
+            }
+            if (silver > 0) {
+                if (currencyString !== "") currencyString += " ";
+                currencyString += `${silver} sp`;
+            }
+            if (copper > 0) {
+                if (currencyString !== "") currencyString += " ";
+                currencyString += `${copper} cp`;
+            }
+
+            return currencyString || "0 gp"; // Return "0 gp" for a cost of 0
+        }
+
+        // --- Dice Rolling Functions ---
+        function rollDice(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function roll2d4() {
+            return rollDice(4) + rollDice(4);
+        }
+
+        function roll2d6() {
+             return rollDice(6) + rollDice(6);
+        }
+
+        // Function to roll dice based on a string (e.g., "1d8", "2d8+2")
+        function rollDiceFromString(diceNotation) {
+            // Handle the special case ">1" for foal age
+            if (diceNotation === '>1') {
+                return 1; // Assuming >1 means 1 year old for simplicity
+            }
+
+            if (diceNotation.startsWith("[") && diceNotation.endsWith("]")) {
+                 diceNotation = diceNotation.replace(/[\[\]]/g, ''); // Remove brackets
+                 if (diceNotation.includes('+')) {
+                     const parts = diceNotation.split('+');
+                     const baseRoll = simulateDiceRoll(parts[0]);
+                     const modifier = parseInt(parts[1], 10);
+                     return baseRoll + modifier;
+                 }
+                 // Handle cases like "[2d2]" after removing brackets
+                 if (diceNotation.includes('d')) {
+                      const parts = diceNotation.split('d');
+                      const numDice = parseInt(parts[0], 10);
+                      const diceType = parseInt(parts[1], 10);
+                      let total = 0;
+                      for (let i = 0; i < numDice; i++) {
+                          total += Math.floor(Math.random() * diceType) + 1;
+                      }
+                      return total;
+                 }
+             }
+
+
+            const parts = diceNotation.split('d');
+            const numDice = parseInt(parts[0], 10);
+            const diceType = parseInt(parts[1], 10);
+            let total = 0;
+            for (let i = 0; i < numDice; i++) {
+                total += Math.floor(Math.random() * diceType) + 1;
+            }
+            return total;
+        }
+
+
+        // --- Data Structures for Tables, Traits, and Stat Blocks (from second_code_canvas and initial_code_canvas) ---
+
+        const horseData = {
+            genderTable: {
+                "1-4": { result: "Gelding", next: ["Horse Type, Other", "Horse Appearance", "Horse Age, Gelding"] },
+                "5-8": { result: "Mare", next: ["Horse Type, Other", "Horse Appearance", "Horse Age, Female"] },
+                "9-12": { result: "Stallion", next: ["Horse Type, Male", "Horse Appearance", "Horse Age, Male"] }
+            },
+
+            horseTypeOther: {
+                "1-2": { result: "Donkey or Mule" },
+                "3-4": { result: "Draft Horse" },
+                "5-6": { result: "Pony" },
+                "7-10": { result: "Riding Horse" }
+            },
+
+            horseTypeMale: {
+                "1": { result: "Wild Horse" },
+                "2-3": { result: "Donkey or Mule" },
+                "4-5": { result: "Draft Horse" },
+                "6-7": { result: "Pony" },
+                "8-9": { result: "Riding Horse" },
+                "10": { result: "Light War Horse" },
+                "11": { result: "Medium War Horse" },
+                "12": { result: "Heavy War Horse" }
+            },
+
+            horseAppearance: {
+                "1": { result: "Jet Black" },
+                "2": { result: "Fading Black" },
+                "3": { result: "Seal Brown" },
+                "4": { result: "Brown" },
+                "5-6": { result: "Horse Color (Bay)", next: ["Horse Color (Bay)"] },
+                "7-8": { result: "Horse Color (Chestnut)", next: ["Horse Color (Chestnut)"] },
+                "9-10": { result: "Horse Color (Gray)", next: ["Horse Color (Gray)"] },
+                "11-12": { result: "Horse Color (Dun Dilute)", next: ["Horse Color (Dun Dilute)"] },
+                "13-14": { result: "Horse Color (Cream Dilute)", next: ["Horse Color (Cream Dilute)"] },
+                "15-16": { result: "Horse Color (Champagne Dilute)", next: ["Horse Color (Champagne Dilute)"] },
+                "17-18": { result: "Horse Color (Silver Dilute)", next: ["Horse Color (Silver Dilute)"] },
+                "19": { result: "Horse Color (Dilute Combination)", next: ["Horse Color (Dilute Combination)"] },
+                "20": { result: "Horse Patterns", next: ["Horse Patterns Table (1D4)"] }
+            },
+
+            horseAgeGelding: {
+                "1-2": { result: "Gelding Colt", years: "[2d2]", traitsTable: "Horse Traits (Young)" },
+                "3-6": { result: "Gelding", years: "[2d8+2]", traitsTable: "Horse Traits (Adult)" },
+                "7": { result: "Aged", years: "[8d4]", traitsTable: "Horse Traits (Old)" },
+                "8": { result: "Crowbait", years: "[10d4]", traitsTable: "Horse Traits (Old)" }
+            },
+
+            horseAgeFemale: {
+                "1": { result: "Foal", years: ">1", traitsTable: "Horse Traits (Young)" },
+                "2": { result: "Filly", years: "[1d3+1]", traitsTable: "Horse Traits (Young)" },
+                "3-4": { result: "Dam", years: "[3d6+2]", traitsTable: "Horse Traits (Adult)" },
+                "5-6": { result: "Mare", years: "[3d6]", traitsTable: "Horse Traits (Adult)" },
+                "7": { result: "Aged", years: "[8d4]", traitsTable: "Horse Traits (Old)" },
+                "8": { result: "Nag", years: "[10d4]", traitsTable: "Horse Traits (Old)" }
+            },
+
+            horseAgeMale: {
+                "1": { result: "Foal", years: ">1", traitsTable: "Horse Traits (Young)" },
+                "2": { result: "Colt", years: "[1d3+1]", traitsTable: "Horse Traits (Young)" },
+                "3-4": { result: "Stud", years: "[3d6+2]", traitsTable: "Horse Traits (Adult)" },
+                "5-6": { result: "Stallion", years: "[3d6]", traitsTable: "Horse Traits (Adult)" },
+                "7": { result: "Aged", years: "[8d4]", traitsTable: "Horse Traits (Old)" },
+                "8": { result: "Crowbait", years: "[10d4]", traitsTable: "Horse Traits (Old)" }
+            },
+
+            horseColorRoan: {
+                "1-2": { result: "Strawberry Roan" },
+                "3-4": { result: "Blue Roan" },
+                "5-6": { result: "Red Roan" },
+                "7-8": { result: "Lilac Roan" },
+                "9-10": { result: "Honey Roan" }
+            },
+
+            horsePatternsTable1D4: {
+                "1": { result: "Basic Patterns", next: ["Horse Basic Patterns"] },
+                "2": { result: "Pinto Patterns", next: ["Horse Pinto Patterns"] },
+                "3": { result: "Appaloosa Pattern", next: ["Horse Appaloosa Patterns"] },
+                "4": { result: "Other Markings", next: ["Horse Other Markings"] }
+            },
+
+            horseBasicPatterns: {
+                "2": { result: "Rabicano" }, // 2d4 roll
+                "3": { result: "Sooty" },
+                "4": { result: "Lemonsilla" },
+                "5": { result: "Mealy" },
+                "6": { result: "Flaxen" },
+                "7": { result: "Brindle" },
+                "8": { result: "Reverse Brindle" }
+            },
+
+            horseOtherMarkings: {
+                "1": { result: "Birdcatcher Spots" },
+                "2": { result: "Chubari Spots" },
+                "3": { result: "Grease Spots" },
+                "4": { result: "Manchado" },
+                "5": { result: "Lacing" },
+                "6": { result: "Mosaic" }
+            },
+
+            horsePintoPatterns: {
+                "1": { result: "Minimal Tobiano" },
+                "2": { result: "Tobiano" },
+                "3": { result: "Extreme Tobiano" },
+                "4": { result: "Medicine Hat" },
+                "5": { result: "Full Head Tobiano" },
+                "6": { result: "Frame" },
+                "7": { result: "Sabino" },
+                "8": { result: "Splash White" },
+                "9": { result: "Tovero" },
+                "10": { result: "Pinto, Appaloosa, and Appearance Subtables", next: ["Horse Pinto Patterns", "Horse Appaloosa Patterns", "Horse Appearance"] }
+            },
+
+            horseAppaloosaPatterns: {
+                "1": { result: "Minimal Blanket" },
+                "2": { result: "Blanket" },
+                "3": { result: "Extended Blanket" },
+                "4": { result: "Leopard" },
+                "5": { result: "Semi-Leopard" },
+                "6": { result: "Marble" },
+                "7": { result: "Frost" },
+                "8": { result: "Snowflake" },
+                "9": { result: "Snowcap" },
+                "10": { result: "Ghost" },
+                "11": { result: "Halo Spots" },
+                "12": { result: "Appaloosa, Pinto, and Appearance Subtables", next: ["Horse Appaloosa Patterns", "Horse Pinto Patterns", "Horse Appearance"] }
+            },
+
+            horseColorBay: {
+                "1": { result: "Blood Bay" },
+                "2": { result: "Copper Bay" },
+                "3": { result: "Dark Bay" },
+                "4": { result: "Faded Bay" },
+                "5": { result: "Gold Bay" },
+                "6": { result: "Mahogany Bay" }
+            },
+
+            horseColorChestnut: {
+                "1": { result: "Sorrel" },
+                "2": { result: "Liver Chestnut" },
+                "3": { result: "Cherry Chestnut" },
+                "4": { result: "Golden Chestnut" },
+                "5": { result: "Honey Chestnut" },
+                "6": { result: "Black Chestnut" }
+            },
+
+            horseColorGray: {
+                "1": { result: "Gray" },
+                "2": { result: "Dapple Gray" },
+                "3": { result: "Rose Gray" },
+                "4": { result: "Iron Gray" },
+                "5": { result: "Dark Gray" },
+                "6": { result: "Mulberry Gray" },
+                "7": { result: "White Gray" },
+                "8": { result: "Fleabitten Gray", next: ["Horse Appearance"] }, // Reroll
+                "9": { result: "Watermark Gray", next: ["Horse Appearance"] }, // Reroll
+                "10": { result: "Horse Color (Roan)", next: ["Horse Color (Roan)"] } // Roll on Roan Subtable
+            },
+
+            horseColorDunDilute: {
+                "1-2": { result: "Peach Dun" },
+                "3-4": { result: "Red Dun" },
+                "5-6": { result: "Copper Dun" },
+                "7-8": { result: "Bronze Dun" },
+                "9-10": { result: "Liver Dun" },
+                "11-12": { result: "Classic Dun" },
+                "13-14": { result: "Buttermilk Dun" },
+                "15": { result: "Slate Dun" },
+                "16": { result: "Blue Dun" },
+                "17": { result: "Silver Dun" },
+                "18": { result: "Coyote Dun" },
+                "19": { result: "Wolf Dun" },
+                "20": { result: "Olive Dun" }
+            },
+
+            horseColorCreamDilute: {
+                "2": { result: "Golden Palomino" }, // 2d6 roll
+                "3": { result: "Caramel Palomino" },
+                "4": { result: "Cremello" },
+                "5": { result: "Smoky Black" },
+                "6": { result: "Smoky Cream" },
+                "7": { result: "Buckskin" },
+                "8": { result: "Buttermilk Buckskin" },
+                "9": { result: "Golden Buckskin" },
+                "10": { result: "Bronze Buckskin" },
+                "11": { result: "Perlino" },
+                "12": { result: "Black Buckskin" }
+            },
+
+            horseColorDiluteCombination: {
+                "1-5": { result: "Yellow Dun" },
+                "6-10": { result: "Cream Dun" },
+                "11-14": { result: "Gold Cream" },
+                "15-18": { result: "Ivory Champagne" },
+                "19-22": { result: "Gold Dun" },
+                "23-26": { result: "Smoky Black Dun" },
+                "27-30": { result: "Smoky Cream Grulla" },
+                "31-34": { result: "Silver Smoky Black" },
+                "35-38": { result: "Smoky Black Champagne" },
+                "39-43": { result: "Classic Dun Champagne" },
+                "44-46": { result: "Silver Dapple Grulla" },
+                "47-51": { result: "Classic Silver" },
+                "52-55": { result: "Silver Dapple Smoky Grulla" },
+                "56-60": { result: "Dunskin" },
+                "61-65": { result: "Dun Perlino" },
+                "66-70": { result: "Silver Buckskin" },
+                "71-75": { result: "Amber Cream" },
+                "76-80": { result: "Amber Dun" },
+                "81-84": { result: "Amber Silver" },
+                "85-88": { result: "Brown Dunskin" },
+                "89-92": { result: "Sable Cream" },
+                "93-96": { result: "Sable Dun" },
+                "97-100": { result: "Pearl" }
+            },
+
+            horseColorChampagneDilute: {
+                "1-2": { result: "Gold Champagne" },
+                "3-4": { result: "Amber Champagne" },
+                "5-6": { result: "Champagne Black" },
+                "7-8": { result: "Sable Champagne" },
+                "9-10": { result: "Dark Gold Champagne" }
+            },
+
+            horseColorSilverDilute: {
+                "1": { result: "Silver Dapple" }, // 1d4 roll
+                "2": { result: "Chocolate Silver" },
+                "3": { result: "Red Silver" },
+                "4": { result: "Blue Silver" }
+            },
+
+            horseTraitsYoung: {
+                "1-10": { result: "2x Bad Traits Subtable", cost: "-75%" },
+                "11-20": { result: "Bad Traits Subtable", cost: "-50%" },
+                "21-35": { result: "Bad Traits Subtable, Neutral Traits Subtable", cost: "-25%" },
+                "36-50": { result: "Neutral Traits Subtable", cost: "Normal" },
+                "51-60": { result: "2x Neutral Traits Subtable", cost: "Normal" },
+                "61-75": { result: "Neutral Traits Subtable, Good Traits Subtable", cost: "25%" },
+                "76-90": { result: "Good Traits Subtable", cost: "75%" },
+                "91-100": { result: "2x Good Traits Subtable", cost: "125%" }
+            },
+
+            horseTraitsAdult: {
+                "1-10": { result: "2x Bad Traits Subtable", cost: "-75%" },
+                "11-20": { result: "Bad Traits Subtable", cost: "-50%" },
+                "21-30": { result: "Bad Traits Subtable, Neutral Traits Subtable", cost: "-25%" },
+                "31-50": { result: "Neutral Traits Subtable", cost: "Normal" },
+                "51-60": { result: "2x Neutral Traits Subtable", cost: "Normal" },
+                "61-70": { result: "Good Traits Subtable, Neutral Traits Subtable", cost: "25%" },
+                "71-90": { result: "Good Traits Subtable", cost: "75%" },
+                "91-100": { result: "2x Good Traits Subtable", cost: "125%" }
+            },
+
+            horseTraitsOld: {
+                "1-20": { result: "2x Bad Traits Subtable", cost: "-75%" },
+                "21-30": { result: "Bad Traits Subtable", cost: "-50%" },
+                "31-50": { result: "Bad Traits Subtable, Neutral Traits Subtable", cost: "-25%" },
+                "51-60": { result: "Neutral Traits Subtable", cost: "Normal" },
+                "61-70": { result: "2x Neutral Traits Subtable", cost: "Normal" },
+                "71-80": { result: "Neutral Traits Subtable, Good Traits Subtable", cost: "25%" },
+                "81-90": { result: "Good Traits Subtable", cost: "75%" },
+                "91-100": { result: "2x Good Traits Subtable", cost: "125%" }
+            },
+
+            badTraits: {
+                "1": { result: "Lame", trainable: "No", effect: "Horse has an injury that makes it unsuitable for riding above a walk or pulling vehicles." },
+                "2": { result: "Biter", trainable: "Yes", effect: "Horse will often (50%) try to bite (1d4 + STR) anyone within 5 feet." },
+                "3": { result: "Bucker", trainable: "Yes", effect: "Horse will often (50%) attempt to buck anyone on its back." },
+                "4": { result: "Kicker", trainable: "Yes", effect: "Horse will often (50%) attempt to kick anyone within 5 feet." },
+                "5": { result: "Rears", trainable: "Yes", effect: "Horse will often (50%) rear in combat. A DC 15 Animal Handling check must be made to stay in the saddle." },
+                "6": { result: "Rough String", trainable: "Yes", effect: "Horse will bite, buck, or kick every time they are saddled." },
+                "7": { result: "Stubborn", trainable: "Yes", effect: "Disadvantage on Animal Handling checks." },
+                "8": { result: "Untrained", trainable: "Yes", effect: "Horse has never known a rider and must be trained." },
+                "9": { result: "Won’t Gallop", trainable: "Yes", effect: "Horse refuses to travel faster than a canter (Speed x2)." },
+                "10": { result: "Neutral Traits Subtable", trainable: "—", effect: "Rolls on Horse Neutral Traits (1d8)." }
+            },
+
+            neutralTraits: {
+                "1": { result: "Chews Fences", trainable: "No", effect: "Horse may cause damage when stabled but gains a bite attack (1d4 + STR) as a bonus action." },
+                "2": { result: "Cob", trainable: "No", effect: "Horse is shorter than average but has a 10% increased carrying capacity." },
+                "3": { result: "Green", trainable: "Yes", effect: "Horse is untrained but has no negative traits." },
+                "4": { result: "Hard Keeper", trainable: "No", effect: "Horse costs 2x as much to feed but can travel 2x as long without tiring." },
+                "5": { result: "Headstrong", trainable: "Yes", effect: "Disadvantage on Animal Handling checks, but the horse has advantage on Wisdom saving throws vs. fear." },
+                "6": { result: "Single Rider", trainable: "Yes", effect: "Horse will not accept any other rider." },
+                "7": { result: "Steps on Feet", trainable: "No", effect: "Horse may step on feet when near but deals an extra 2 damage on hoof attacks." },
+                "8": { result: "Good Traits Subtable", trainable: "—", effect: "Rolls on Horse Good Traits (1d8)." }
+            },
+
+            goodTraits: {
+                "1": { result: "Charger", trainable: "No", effect: "Horse has advantage on Wisdom saving throws vs. fear and +2 to attack and damage rolls when charging." },
+                "2": { result: "Easy Keeper", trainable: "No", effect: "Horse does not consume much; feed costs are halved." },
+                "3": { result: "Fast", trainable: "No", effect: "Speed increases by 15 feet." },
+                "4": { result: "High-Spirited", trainable: "No", effect: "+1 to attack rolls, damage rolls, and Speed +5 feet." },
+                "5": { result: "Knows Trick", trainable: "Yes", effect: "Rolls on Horse Trick Subtable (1d6)." },
+                "6": { result: "Leaper", trainable: "No", effect: "A riding check is not needed for obstacles up to 5 feet or gaps up to 20 feet." },
+                "7": { result: "Strong", trainable: "No", effect: "Carrying capacity is increased by 15%." },
+                "8": { result: "Good Traits Subtable x2", trainable: "—", effect: "Rolls twice on this table." }
+            },
+
+            horseTrickSubtable: {
+                "1": { result: "Bow", trainable: "Yes", effect: "Horse will bow when prompted so long as it is under its Max Canter Weight." },
+                "2": { result: "Whistle", trainable: "Yes", effect: "Horse will come to your whistle when within hearing distance." },
+                "3": { result: "Wait", trainable: "Yes", effect: "Horse will wait in a 30-foot radius when instructed for up to 2d4 hours." },
+                "4": { result: "Fetch", trainable: "Yes", effect: "Horse will fetch one item that you predetermine. Can be changed once per week." },
+                "5": { result: "Trick Riding", trainable: "Yes", effect: "Rider has advantage on Animal Handling checks involving tricks." },
+                "6": { result: "Lie Down", trainable: "Yes", effect: "Horse will lie down when commanded for up to 1 minute." }
+            },
+
+             statBlocks: {
+                'Draft Horse': {
+                    size: 'Large Beast, Unaligned',
+                    ac: 10,
+                    hp: '15 (2d10+4)',
+                    speed: '40 ft.',
+                    str: '18 (+4)', dex: '10 (+0)', con: '15 (+2)',
+                    int: '2 (-4)', wis: '11 (+0)', cha: '7 (-2)',
+                    saves: { str: '+4', dex: '+0', con: '+2', int: '-4', wis: '+2', cha: '-2' },
+                    senses: 'Passive Perception 10',
+                    languages: '-',
+                    cr: '1/4 (50 XP; PB +2)',
+                    traits: [{ name: 'Beast of Burden', effect: 'The draft horse counts as one size larger for the purposes of carrying capacity and push/drag/lift limits.' }],
+                    actions: [{ name: 'Hooves', effect: 'Melee Attack Roll: +6 to hit, reach 5 ft., one target. Hit: 6 (1d4+4) bludgeoning damage.' }]
+                },
+                'Wild Horse': {
+                     size: 'Large Beast, Unaligned',
+                    ac: 12,
+                    hp: '19 (3d10+3)',
+                    speed: '60 ft.',
+                    str: '16 (+3)', dex: '14 (+2)', con: '12 (+1)',
+                    int: '2 (-4)', wis: '13 (+1)', cha: '5 (-3)',
+                    saves: { str: '+3', dex: '+2', con: '+1', int: '-4', wis: '+3', cha: '-3' },
+                    senses: 'Passive Perception 11',
+                    languages: '-',
+                    cr: '1/4 (50 XP; PB +2)',
+                    traits: [{ name: 'Wary', effect: 'The horse has advantage on Wisdom (Perception) checks that rely on hearing or smell.' }],
+                    actions: [{ name: 'Hooves', effect: 'Melee Attack Roll: +5 to hit, reach 5 ft., one target. Hit: 10 (1d8+3) bludgeoning damage.' }]
+                },
+                'Light War Horse': {
+                    size: 'Large Beast, Unaligned',
+                    ac: 12,
+                    hp: '13 (2d10+2)',
+                    speed: '70 ft.',
+                    str: '15 (+2)', dex: '14 (+2)', con: '12 (+1)',
+                    int: '2 (-4)', wis: '12 (+1)', cha: '6 (-2)',
+                     saves: { str: '+2', dex: '+2', con: '+1', int: '-4', wis: '+1', cha: '-2' },
+                    senses: 'Passive Perception 11',
+                    languages: '-',
+                    cr: '1/4 (50 XP; PB +2)',
+                    traits: [], // No specific traits listed in the stat block provided
+                    actions: [
+                        { name: 'Multiattack', effect: 'The horse makes one Hooves attack and one Bite attack.' },
+                        { name: 'Hooves', effect: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4+2) bludgeoning damage.' },
+                        { name: 'Bite', effect: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6+2) piercing damage.' }
+                    ]
+                },
+                 'Medium War Horse': {
+                    size: 'Large Beast, Unaligned',
+                    ac: 11,
+                    hp: '24 (3d10+6)',
+                    speed: '60 ft.',
+                    str: '17 (+3)', dex: '12 (+1)', con: '14 (+2)',
+                    int: '2 (-4)', wis: '12 (+1)', cha: '6 (-2)',
+                     saves: { str: '+3', dex: '+1', con: '+2', int: '-4', wis: '+3', cha: '-2' },
+                    senses: 'Passive Perception 11',
+                    languages: '-',
+                    cr: '1/2 (100 XP; PB +2)',
+                    traits: [], // No specific traits listed in the stat block provided
+                    actions: [
+                        { name: 'Multiattack', effect: 'The horse makes one Hooves attack and one Bite attack.' },
+                        { name: 'Hooves', effect: 'Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 8 (2d4+3) bludgeoning damage. If the horse moved at least 20 ft. straight toward the target before hitting, the target must succeed on a DC 13 Strength saving throw or fall prone.' },
+                        { name: 'Bite', effect: 'Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 6 (1d6+3) piercing damage.' }
+                    ]
+                },
+                'Heavy War Horse': {
+                    size: 'Large Beast, Unaligned',
+                    ac: 10,
+                    hp: '32 (4d10+8)',
+                    speed: '50 ft.',
+                    str: '18 (+4)', dex: '10 (+0)', con: '14 (+2)',
+                    int: '2 (-4)', wis: '12 (+1)', cha: '6 (-2)',
+                     saves: { str: '+4', dex: '+0', con: '+2', int: '-4', wis: '+3', cha: '-2' },
+                    senses: 'Passive Perception 11',
+                    languages: '-',
+                    cr: '1 (200 XP; PB +2)',
+                    traits: [{ name: 'Trampling Charge', effect: 'If the horse moves at least 20 feet straight toward a creature and hits it with a hoof attack on the same turn, the target takes an extra 7 (2d6) bludgeoning damage and must succeed on a DC 14 Strength saving throw or fall prone.' }],
+                    actions: [
+                         { name: 'Multiattack', effect: 'The horse makes one Hooves attack and one Bite attack.' },
+                        { name: 'Hooves', effect: 'Melee Attack Roll: +6 to hit, reach 5 ft., one target. Hit: 11 (2d6+4) bludgeoning damage.' },
+                        { name: 'Bite', effect: 'Melee Attack Roll: +6 to hit, reach 5 ft., one target. Hit: 7 (1d6+4) piercing damage.' }
+                    ]
+                },
+                // Stat blocks added from SRD 5.2
+                 'Donkey or Mule': { // Using Mule stat block as a base
+                    size: 'Medium Beast, Unaligned',
+                    ac: 10,
+                    hp: '11 (2d8+2)',
+                    speed: '40 ft.',
+                    str: '14 (+2)', dex: '10 (+0)', con: '13 (+1)',
+                    int: '2 (-4)', wis: '10 (+0)', cha: '5 (-3)',
+                    saves: { str: '+2', dex: '+0', con: '+1', int: '-4', wis: '+0', cha: '-3' },
+                    senses: 'Passive Perception 10',
+                    languages: '-',
+                    cr: '1/8 (25 XP; PB +2)',
+                    traits: [{ name: 'Beast of Burden', effect: 'The mule counts as one size larger for the purpose of determining its carrying capacity.' }],
+                    actions: [{ name: 'Hooves', effect: 'Melee Attack Roll: +4 to hit, reach 5 ft., one target. Hit: 4 (1d4+2) bludgeoning damage.' }]
+                },
+                'Pony': {
+                    size: 'Medium Beast, Unaligned',
+                    ac: 10,
+                    hp: '11 (2d8+2)',
+                    speed: '40 ft.',
+                    str: '15 (+2)', dex: '10 (+0)', con: '13 (+1)',
+                    int: '2 (-4)', wis: '11 (+0)', cha: '7 (-2)',
+                    saves: { str: '+2', dex: '+0', con: '+1', int: '-4', wis: '+0', cha: '-2' },
+                    senses: 'Passive Perception 10',
+                    languages: '-',
+                    cr: '1/8 (25 XP; PB +2)',
+                    traits: [], // No specific traits listed in the stat block provided
+                    actions: [{ name: 'Hooves', effect: 'Melee Attack Roll: +4 to hit, reach 5 ft., one target. Hit: 4 (1d4+2) bludgeoning damage.' }]
+                },
+                'Riding Horse': {
+                    size: 'Large Beast, Unaligned',
+                    ac: 11,
+                    hp: '13 (2d10+2)',
+                    speed: '60 ft.',
+                    str: '16 (+3)', dex: '13 (+1)', con: '12 (+1)',
+                    int: '2 (-4)', wis: '11 (+0)', cha: '7 (-2)',
+                    saves: { str: '+3', dex: '+1', con: '+1', int: '-4', wis: '+1', cha: '-2' },
+                    senses: 'Passive Perception 10',
+                    languages: '-',
+                    cr: '1/4 (50 XP; PB +2)',
+                    traits: [], // No specific traits listed in the stat block provided
+                    actions: [{ name: 'Hooves', effect: 'Melee Attack Roll: +5 to hit, reach 5 ft., one target. Hit: 7 (1d8+3) bludgeoning damage.' }]
+                }
+            },
+
+             traitEffects: {
+                'Lame': 'Horse has an injury that makes it unsuitable for riding above a walk or pulling vehicles.',
+                'Biter': 'Horse will often (50%) try to bite (1d4+STR) anyone within 5 feet.',
+                'Bucker': 'Horse will often (50%) attempt to buck anyone on its back.',
+                'Kicker': 'Horse will often (50%) attempt to kick anyone within 5 feet.',
+                'Rears': 'Horse will often (50%) rear in combat. A DC 15 Animal Handling check must be made to stay in the saddle.',
+                'Rough String': 'Horse will bite, buck, or kick every time they are saddled.',
+                'Stubborn': 'Disadvantage on Animal Handling checks.',
+                'Untrained': 'Horse has never known a rider and must be trained.',
+                'Won\'t Gallop': 'Horse refuses to travel faster than a canter (Speed x2).',
+                'Chews Fences': 'Horse may cause damage when stabled but gains a bite attack (1d4+STR) as a bonus action.',
+                'Cob': 'Horse is shorter than average but has a 10% increased carrying capacity.',
+                'Green': 'Horse is untrained but has no negative traits.',
+                'Hard Keeper': 'Horse costs 2x as much to feed but can travel 2x as long without tiring.',
+                'Headstrong': 'Disadvantage on Animal Handling checks, but the horse has advantage on Wisdom saving throws vs. fear.',
+                'Single Rider': 'Horse will not accept any other rider.',
+                'Steps on Feet': 'Horse may step on feet when near but deals an extra 2 damage on hoof attacks.',
+                'Charger': 'Horse has advantage on Wisdom saving throws vs. fear and +2 to attack and damage rolls when charging.',
+                'Easy Keeper': 'Horse does not consume much; feed costs are halved.',
+                'Fast': 'Speed increases by 15 feet.',
+                'High-Spirited': '+1 to attack rolls, damage rolls, and Speed +5 feet.',
+                'Knows Trick': 'Rolls on Horse Trick Subtable (1d6).', // This will be replaced with the specific trick
+                'Leaper': 'A riding check is not needed for obstacles up to 5 feet or gaps up to 20 feet.',
+                'Strong': 'Carrying capacity is increased by 15%.',
+                'Bow': 'Horse will bow when prompted so long as it is under its Max Canter Weight.',
+                'Whistle': 'Horse will come to your whistle when within hearing distance.',
+                'Wait': 'Horse will wait in a 30-foot radius when instructed for up to 2d4 hours.',
+                'Fetch': 'Horse will fetch one item that you predetermine. Can be changed once per week.',
+                'Trick Riding': 'Rider has advantage on Animal Handling checks involving tricks.',
+                'Lie Down': 'Horse will lie down when commanded for up to 1 minute.',
+                'Rabicano': 'White hairs mixed into the coat, typically on the flanks and belly.',
+                'Sooty': 'Dark shading on the coat, often concentrated on the back and shoulders.',
+                'Lemonsilla': 'A yellowish or pale gold coat color.',
+                'Mealy': 'Lighter shading on the muzzle, flanks, and belly.',
+                'Flaxen': 'Yellowish or white mane and tail on a horse with a darker body color.',
+                'Brindle': 'A rare pattern characterized by vertical or horizontal stripes.',
+                'Reverse Brindle': 'Similar to Brindle, but with the stripes appearing lighter than the base coat.',
+                'Birdcatcher Spots': 'Small, round, white spots that appear on a horse’s coat.',
+                'Chubari Spots': 'Similar to Birdcatcher spots but larger and more irregular.',
+                'Grease Spots': 'Dark spots that appear on a horse\'s coat, often associated with sweat.',
+                'Manchado': 'A rare pattern characterized by large white patches with jagged edges.',
+                'Lacing': 'A pattern of white lines that appear on a horse\'s coat, resembling lace.',
+                'Mosaic': 'A rare pattern where patches of different colors are mixed together.',
+                'Minimal Tobiano': 'Small, scattered white patches, usually on the legs.',
+                'Tobiano': 'White patches that typically originate on the legs and extend upwards over the body.',
+                'Extreme Tobiano': 'Large white patches covering most of the body, with minimal dark areas.',
+                'Medicine Hat': 'A white horse with a colored head and sometimes a shield-shaped marking on the chest.',
+                'Full Head Tobiano': 'A Tobiano pattern with a completely colored head.',
+                'Frame': 'White patches on the sides of the body, framed by colored areas.',
+                'Sabino': 'White markings that typically start on the belly and legs and spread upwards, often with roaning.',
+                'Splash White': 'White markings that appear as if the horse has been dipped in white paint, often with crisp edges.',
+                'Tovero': 'A combination of Tobiano and Overo patterns.',
+                 'Minimal Blanket': 'A small white area over the loins or hindquarters.',
+                'Blanket': 'A white area over the hindquarters, usually with spots within it.',
+                'Extended Blanket': 'A white area extending forward over the back and sometimes the neck, usually with spots.',
+                'Leopard': 'White over the entire body with colored spots.',
+                'Semi-Leopard': 'White over the hindquarters and sometimes the front, with colored spots.',
+                'Marble': 'Mottled or marbled pattern of dark and light hairs, often on the face and legs.',
+                'Frost': 'White hairs mixed into the base coat, giving a frosted appearance.',
+                'Snowflake': 'White spots on a darker background.',
+                'Snowcap': 'A solid white area over the hindquarters without spots.',
+                'Ghost': 'A faint, shadowy pattern.',
+                'Halo Spots': 'Darker rings around white spots.',
+                 'Strawberry Roan': 'White hairs mixed into the base coat, giving a frosted appearance.',
+                'Blue Roan': 'White hairs mixed with a black base coat.',
+                'Red Roan': 'White hairs mixed with a bay base coat.',
+                'Lilac Roan': 'White hairs mixed with a gray base coat.',
+                'Honey Roan': 'White hairs mixed with a chestnut base coat.'
+
+            }
+
+
+        };
+
+        // Base costs for each mount type from SRD 5.2 and suggested for Wild Horse
+        const baseCosts = {
+            'Donkey or Mule': 8,
+            'Draft Horse': 50,
+            'Pony': 30,
+            'Riding Horse': 75,
+            'Wild Horse': 75, // Suggested price
+            'Light War Horse': 400, // Based on Warhorse
+            'Medium War Horse': 400, // Based on Warhorse
+            'Heavy War Horse': 400 // Based on Warhorse
+        };
+
+
+        // --- Helper functions for rolling on specific tables ---
+
+        function rollOnTable(tableData, diceRoll) {
+            for (const range in tableData) {
+                if (range.includes('-')) {
+                    const [min, max] = range.split('-').map(Number);
+                    if (diceRoll >= min && diceRoll <= max) {
+                        return tableData[range];
+                    }
+                } else {
+                    const singleValue = Number(range);
+                    if (diceRoll === singleValue) {
+                        return tableData[range];
+                    }
+                }
+            }
+            return null;
+        }
+
+
+        // --- Trait Generation Helper Functions (from second_code_canvas) ---
+
+        const getBadTrait = () => {
+            let traitRoll = rollDice(10);
+             if (traitRoll === 10) {
+                // If roll is 10, roll on Neutral Traits Subtable instead
+                const neutralResult = getNeutralTrait();
+                if(neutralResult) neutralTraits.push(neutralResult);
+                return null; // No bad trait from this roll
+            } else {
+                // Otherwise, roll on the Bad Traits table
+                const badTraitTableRoll = rollDice(9); // Roll 1d9 for the actual bad traits
+                if (badTraitTableRoll === 1) return 'Lame';
+                if (badTraitTableRoll === 2) return 'Biter';
+                if (badTraitTableRoll === 3) return 'Bucker';
+                if (badTraitTableRoll === 4) return 'Kicker';
+                if (badTraitTableRoll === 5) return 'Rears';
+                if (badTraitTableRoll === 6) return 'Rough String';
+                if (badTraitTableRoll === 7) return 'Stubborn';
+                if (badTraitTableRoll === 8) return 'Untrained';
+                if (badTraitTableRoll === 9) return 'Won\'t Gallop';
+                }
+                 return 'Unknown Bad Trait';
+            };
+
+            const getGoodTrait = () => {
+                let traitRoll = rollDice(8);
+                if (traitRoll === 8) {
+                    // If roll is 8, roll twice on this table
+                    goodTraits.push(getGoodTrait()); // Recursive call
+                    goodTraits.push(getGoodTrait()); // Recursive call
+                    return null; // Return null for the current roll, as traits are added recursively
+                } else {
+                    // Otherwise, roll on the Good Traits table
+                     if (traitRoll === 1) return 'Charger';
+                    if (traitRoll === 2) return 'Easy Keeper';
+                    if (traitRoll === 3) return 'Fast';
+                    if (traitRoll === 4) return 'High-Spirited';
+                    if (traitRoll === 5) return 'Knows Trick'; // Need to roll on Trick Subtable
+                    if (traitRoll === 6) return 'Leaper';
+                    if (traitRoll === 7) return 'Strong';
+                }
+                 return 'Unknown Good Trait';
+            };
+
+             const getNeutralTrait = () => {
+                let traitRoll = rollDice(8);
+                 if (traitRoll === 8) {
+                    // If roll is 8, roll on Good Traits Subtable instead
+                    const goodResult = getGoodTrait();
+                    if(goodResult) goodTraits.push(goodResult); // Add the single good trait
+                     return null; // No neutral trait from this roll
+                } else {
+                    // Otherwise, roll on the Neutral Traits table
+                    if (traitRoll === 1) return 'Chews Fences';
+                    if (traitRoll === 2) return 'Cob';
+                    if (traitRoll === 3) return 'Green';
+                    if (traitRoll === 4) return 'Hard Keeper';
+                    if (traitRoll === 5) return 'Headstrong';
+                    if (traitRoll === 6) return 'Single Rider';
+                    if (traitRoll === 7) return 'Steps on Feet';
+                }
+                 return 'Unknown Neutral Trait';
+            };
+
+        const getHorseTrick = () => {
+             const roll = rollDice(6);
+             if (roll === 1) return 'Bow';
+             if (roll === 2) return 'Whistle';
+             if (roll === 3) return 'Wait';
+             if (roll === 4) return 'Fetch';
+             if (roll === 5) return 'Trick Riding';
+             if (roll === 6) return 'Lie Down';
+             return 'Unknown Trick';
+        }
+
+
+        // --- Appearance Generation Helper Functions (from second_code_canvas, adapted) ---
+
+        function determineBayColor() {
+            const roll = rollDice(6);
+            if (roll === 1) return 'Blood Bay';
+            if (roll === 2) return 'Copper Bay';
+            if (roll === 3) return 'Dark Bay';
+            if (roll === 4) return 'Faded Bay';
+            if (roll === 5) return 'Gold Bay';
+            if (roll === 6) return 'Mahogany Bay';
+            return 'Unknown Bay';
+        }
+
+         function determineChestnutColor() {
+            const roll = rollDice(6);
+            if (roll === 1) return 'Sorrel';
+            if (roll === 2) return 'Liver Chestnut';
+            if (roll === 3) return 'Cherry Chestnut';
+            if (roll === 4) return 'Golden Chestnut';
+            if (roll === 5) return 'Honey Chestnut';
+            if (roll === 6) return 'Black Chestnut';
+            return 'Unknown Chestnut';
+        }
+
+        function determineGrayColor() {
+            const roll = rollDice(10);
+            if (roll >= 1 && roll <= 7) return { color: rollOnTable(horseData.horseColorGray, roll).result, nextTable: null };
+            if (roll === 8 || roll === 9) return { color: rollOnTable(horseData.horseColorGray, roll).result, nextTable: "Horse Appearance" }; // Reroll
+            if (roll === 10) return { color: rollOnTable(horseData.horseColorGray, roll).result, nextTable: "Horse Color (Roan)" }; // Rolls on Roan Subtable
+            return { color: 'Unknown Gray', nextTable: null };
+        }
+
+        function determineDunDiluteColor() {
+            const roll = rollDice(20);
+            return rollOnTable(horseData.horseColorDunDilute, roll).result;
+        }
+
+         function determineCreamDiluteColor() {
+            const roll = roll2d6(); // 2d6
+             return rollOnTable(horseData.horseColorCreamDilute, roll).result;
+        }
+
+        function determineChampagneDiluteColor() {
+            const roll = rollDice(10);
+            return rollOnTable(horseData.horseColorChampagneDilute, roll).result;
+        }
+
+         function determineSilverDiluteColor() {
+            const roll = rollDice(4);
+             return rollOnTable(horseData.horseColorSilverDilute, roll).result;
+        }
+
+        function determineDiluteCombinationColor() {
+            const roll = rollDice(100);
+            return rollOnTable(horseData.horseColorDiluteCombination, roll).result;
+        }
+
+        function determineRoanColor() {
+            const roll = rollDice(10);
+            const result = rollOnTable(horseData.horseColorRoan, roll);
+            return { color: result.result, nextTable: "Horse Appearance" }; // Roan leads to reroll on Appearance
+        }
+
+        function determineHorsePatterns() {
+            const roll = rollDice(4);
+            const result = rollOnTable(horseData.horsePatternsTable1D4, roll);
+            let nextTable = null;
+            if (result.next && result.next.length > 0) {
+                 // Extract the table name from the instruction string "Roll on Table Name"
+                 nextTable = result.next[0].replace("Roll on ", "");
+            }
+            return { type: result.result, nextTable: nextTable };
+        }
+
+        function determineBasicPatterns() {
+            const roll = roll2d4(); // 2d4
+             const result = rollOnTable(horseData.horseBasicPatterns, roll);
+             return { pattern: result.result, nextTable: "Horse Appearance" }; // Basic Patterns lead to reroll on Appearance
+        }
+
+         function determinePintoPatterns() {
+            const roll = rollDice(10);
+            const result = rollOnTable(horseData.horsePintoPatterns, roll);
+             let nextTable = null;
+             if (result.next && result.next.length > 0) {
+                 // For Pinto/Appaloosa/Appearance combination, the next instruction is complex
+                 // We'll handle this by returning the instruction string and processing it in determineHorseAppearance
+                 nextTable = result.next[0];
+             } else if (result.result !== 'Pinto, Appaloosa, and Appearance Subtables') {
+                  // Other Pinto results lead to reroll on Appearance
+                  nextTable = "Horse Appearance";
+             }
+
+             return { pattern: result.result, nextTable: nextTable };
+        }
+
+        function determineAppaloosaPatterns() {
+            const roll = rollDice(12);
+            const result = rollOnTable(horseData.horseAppaloosaPatterns, roll);
+            let nextTable = null;
+             if (result.next && result.next.length > 0) {
+                 // For Appaloosa/Pinto/Appearance combination, the next instruction is complex
+                 // We'll handle this by returning the instruction string and processing it in determineHorseAppearance
+                 nextTable = result.next[0];
+             } else if (result.result !== 'Appaloosa, Pinto, and Appearance Subtables') {
+                 // Other Appaloosa results lead to reroll on Appearance
+                 nextTable = "Horse Appearance";
+             }
+            return { pattern: result.result, nextTable: nextTable };
+        }
+
+        function determineOtherMarkings() {
+            const roll = rollDice(6);
+             const result = rollOnTable(horseData.horseOtherMarkings, roll);
+             return { marking: result.result, nextTable: "Horse Appearance" }; // Other Markings lead to reroll on Appearance
+        }
+
+
+        // --- Determine Mount Type ---
+        function determineMountType(table) {
+             if (table === 'Horse Type, Other') {
+                const roll = rollDice(10);
+                const result = rollOnTable(horseData.horseTypeOther, roll);
+                return result ? result.result : 'Unknown Type';
+            } else if (table === 'Horse Type, Male') {
+                const roll = rollDice(12);
+                const result = rollOnTable(horseData.horseTypeMale, roll);
+                return result ? result.result : 'Unknown Type';
+            }
+            return 'Unknown Type'; // Should not happen if logic is correct
+        }
+
+        // --- Determine Horse Age ---
+        function determineHorseAge(table) {
+            const roll = rollDice(8);
+            let category = 'Unknown';
+            let years = 0;
+            let traitsTable = 'Unknown';
+
+            let result = null;
+            if (table === 'Horse Age, Gelding') {
+                result = rollOnTable(horseData.horseAgeGelding, roll);
+            } else if (table === 'Horse Age, Female') {
+                result = rollOnTable(horseData.horseAgeFemale, roll);
+            } else if (table === 'Horse Age, Male') {
+                result = rollOnTable(horseData.horseAgeMale, roll);
+            }
+
+            if (result) {
+                category = result.result;
+                years = rollDiceFromString(result.years);
+                traitsTable = result.traitsTable;
+            }
+
+             // Handle the special case for Foal age ">1"
+            if (category === 'Foal' && years <= 1) {
+                 years = 1; // Assuming ">1" means at least 1 year old.
+            }
+
+
+            return { category, years, traitsTable };
+        }
+
+
+        // --- Main Generation Function (Updated) ---
+
+        function generateHorse() {
+            const debug = true;
+
+            // --- Step 1: Determine Gender and Initial Tables to Roll ---
+            const genderSelect = document.getElementById("horseGender").value;
+            let genderResult = null;
+            let generatedAttributes = {};
+            generatedAttributes["Traits"] = []; // Initialize Traits as an empty array
+
+
+            if (genderSelect === "roll") {
+                // Corrected call to rollDice and pass result to rollOnTable
+                genderResult = rollOnTable(horseData.genderTable, rollDice(12));
+            } else {
+                // User selected a specific gender, find the corresponding entry
+                for (const range in horseData.genderTable) {
+                    if (horseData.genderTable[range].result === genderSelect) {
+                        genderResult = horseData.genderTable[range];
+                        break;
+                    }
+                }
+            }
+
+            if (genderResult) {
+                generatedAttributes["Gender"] = genderResult.result;
+                // Process initial tables directly based on the gender result's 'next' instructions
+                if (genderResult.next) {
+                    genderResult.next.forEach(instruction => {
+                        if (instruction === "Horse Type, Other") {
+                            generatedAttributes["Mount Type"] = determineMountType("Horse Type, Other");
+                        } else if (instruction === "Horse Type, Male") {
+                            generatedAttributes["Mount Type"] = determineMountType("Horse Type, Male");
+                        } else if (instruction === "Horse Appearance") {
+                             // determineHorseAppearance handles its own nested rolls and rerolls
+                            generatedAttributes["Appearance"] = determineHorseAppearance();
+                        } else if (instruction.startsWith("Horse Age")) {
+                            const ageResult = determineHorseAge(instruction);
+                            generatedAttributes["Age"] = { category: ageResult.category, years: ageResult.years };
+                            // Determine traits based on the age result's traitsTable
+                            if (ageResult.traitsTable) {
+                                const traitsResult = determineHorseTraits(ageResult.traitsTable);
+                                // Add traits to the generatedAttributes["Traits"] array
+                                // Filter out nulls from recursive calls
+                                generatedAttributes["Traits"].push(...traitsResult.badTraits.filter(t => t !== null).map(t => ({ result: t, type: "Bad Trait", trainable: horseData.badTraits[Object.keys(horseData.badTraits).find(key => horseData.badTraits[key].result === t)]?.trainable, effect: horseData.traitEffects[t] })));
+                                generatedAttributes["Traits"].push(...traitsResult.neutralTraits.filter(t => t !== null).map(t => ({ result: t, type: "Neutral Trait", trainable: horseData.neutralTraits[Object.keys(horseData.neutralTraits).find(key => horseData.neutralTraits[key].result === t)]?.trainable, effect: horseData.traitEffects[t] })));
+                                // Handle Good Traits, including the Knows Trick sub-trait
+                                traitsResult.goodTraits.filter(t => t !== null).forEach(goodTrait => {
+                                    if (goodTrait.startsWith('Knows Trick')) {
+                                         // If it's a Knows Trick result, parse the trick and add as one trait object
+                                         const trickMatch = goodTrait.match(/Knows Trick \((.*?)\)/);
+                                         if (trickMatch && trickMatch[1]) {
+                                              const trickName = trickMatch[1];
+                                              generatedAttributes["Traits"].push({
+                                                  result: `Knows Trick (${trickName})`,
+                                                  type: "Good Trait (Trick)",
+                                                  trainable: "Yes", // Tricks are trainable
+                                                  effect: horseData.traitEffects[trickName] || "Effect not specified."
+                                              });
+                                         }
+                                    } else {
+                                         // Otherwise, add as a regular good trait
+                                         generatedAttributes["Traits"].push({
+                                             result: goodTrait,
+                                             type: "Good Trait",
+                                             trainable: horseData.goodTraits[Object.keys(horseData.goodTraits).find(key => horseData.goodTraits[key].result === goodTrait)]?.trainable,
+                                             effect: horseData.traitEffects[goodTrait] || "Effect not specified."
+                                         });
+                                    }
+                                });
+
+                                generatedAttributes["Cost Modifier"] = traitsResult.costModifier;
+                            }
+                        }
+                    });
+                }
+
+
+                 if (debug) console.log("Initial tables processed. Generated Attributes:", generatedAttributes);
+            } else {
+                 generatedAttributes["Gender"] = "Unknown";
+                 if (debug) console.warn("Could not determine gender from roll or selection.");
+            }
+
+            // --- Step 3: Calculate Cost ---
+            const mountType = generatedAttributes["Mount Type"];
+            const costModifier = generatedAttributes["Cost Modifier"];
+            let baseCost = baseCosts[mountType] || 0; // Get base cost, default to 0 if not found
+
+            let calculatedCost = baseCost;
+
+            if (costModifier && costModifier !== 'Normal') {
+                const percentageMatch = costModifier.match(/([\+\-]?\d+)%/);
+                if (percentageMatch && percentageMatch[1]) {
+                    const percentage = parseInt(percentageMatch[1], 10);
+                    calculatedCost = baseCost * (1 + percentage / 100);
+                }
+            }
+
+            generatedAttributes["Calculated Cost"] = calculatedCost;
+            generatedAttributes["Formatted Cost"] = convertToCurrency(calculatedCost);
+
+
+            // --- Step 4: Generate Name (Adapt as needed) ---
+            const horseName = generateHorseName(generatedAttributes);
+
+
+            // --- Step 5: Display Results ---
+            document.getElementById("horseName").textContent = horseName;
+            document.getElementById("gender").textContent = generatedAttributes["Gender"] || "N/A";
+            document.getElementById("mountType").textContent = generatedAttributes["Mount Type"] || "N/A";
+            document.getElementById("appearance").textContent = formatAppearance(generatedAttributes["Appearance"]) || "N/A"; // Use formatAppearance
+
+            // Display Age with category and years
+            document.getElementById("age").textContent = generatedAttributes["Age"] ? `${generatedAttributes["Age"].category} (${generatedAttributes["Age"].years} years old)` : "N/A";
+
+            // Format and display traits
+            const traitsListElement = document.getElementById("traits");
+            traitsListElement.innerHTML = ""; // Clear previous traits
+
+            if (generatedAttributes["Traits"] && generatedAttributes["Traits"].length > 0) {
+                 generatedAttributes["Traits"].forEach(trait => {
+                     const traitItem = document.createElement("p"); // Use <p> for each trait for better structure
+                     let traitString = `<strong>${trait.result}</strong>`; // Bold the trait name
+                     if (trait.trainable !== undefined && trait.trainable !== "—") { // Check for undefined as well
+                         traitString += ` (Trainable: ${trait.trainable})`;
+                     }
+                     if (trait.effect) {
+                         traitString += ` - ${trait.effect}`;
+                     }
+                     traitItem.innerHTML = traitString;
+                     traitsListElement.appendChild(traitItem);
+                 });
+            } else {
+                 traitsListElement.textContent = "None"; // Should ideally not be reached with the new logic
+            }
+
+             document.getElementById("costModifier").textContent = generatedAttributes["Cost Modifier"] || "N/A";
+             document.getElementById("calculatedCost").textContent = generatedAttributes["Formatted Cost"] || "N/A";
+
+
+             // Display Stat Block if available
+             const statBlockOutputElement = document.getElementById("statBlockOutput");
+             statBlockOutputElement.innerHTML = ""; // Clear previous stat block
+
+             const statBlock = horseData.statBlocks[generatedAttributes["Mount Type"]];
+             if (statBlock) {
+                 let statBlockHTML = `
+                     <div class="stat-block">
+                         <h3>${generatedAttributes["Mount Type"]} Stat Block</h3>
+                         <p><em>${statBlock.size || ''}</em></p>
+                         <p><strong>AC:</strong> ${statBlock.ac || 'N/A'}</p>
+                         <p><strong>HP:</strong> ${statBlock.hp || 'N/A'}</p>
+                         <p><strong>Speed:</strong> ${statBlock.speed || 'N/A'}</p>
+                         <div class="abilities">
+                             <div class="ability"><strong>STR</strong> ${statBlock.str || 'N/A'}</div>
+                             <div class="ability"><strong>DEX</strong> ${statBlock.dex || 'N/A'}</div>
+                             <div class="ability"><strong>CON</strong> ${statBlock.con || 'N/A'}</div>
+                             <div class="ability"><strong>INT</strong> ${statBlock.int || 'N/A'}</div>
+                             <div class="ability"><strong>WIS</strong> ${statBlock.wis || 'N/A'}</div>
+                             <div class="ability"><strong>CHA</strong> ${statBlock.cha || 'N/A'}</div>
+                         </div>
+                         <p><strong>Senses:</strong> ${statBlock.senses || 'N/A'}</p>
+                         <p><strong>Languages:</strong> ${statBlock.languages || 'N/A'}</p>
+                         <p><strong>CR:</strong> ${statBlock.cr || 'N/A'}</p>
+                         ${statBlock.traits && statBlock.traits.length > 0 ? '<p><strong>Stat Block Traits:</strong></p><ul>' + statBlock.traits.map(t => `<li><em>${t.name}.</em> ${t.effect}</li>`).join('') + '</ul>' : ''}
+                         ${statBlock.actions && statBlock.actions.length > 0 ? '<p><strong>Actions:</strong></p><ul>' + statBlock.actions.map(a => `<li><em>${a.name}.</em> ${a.effect}</li>`).join('') + '</ul>' : ''}
+                     </div>
+                 `;
+                 statBlockOutputElement.innerHTML = statBlockHTML;
+             } else {
+                  statBlockOutputElement.innerHTML = '<p class="mt-4 text-gray-600"><em>Stat block not provided in the data for this horse type.</em></p>';
+             }
+
+
+            if (debug) {
+                console.log("Final Generated Attributes:", generatedAttributes);
+            }
+        }
+
+        // --- Appearance Formatting Function (from second_code_canvas) ---
+        function formatAppearance(appearance) {
+            if (!appearance) return 'N/A';
+
+            let appearanceString = '';
+            if (appearance.color) {
+                appearanceString += appearance.color;
+            }
+            // Append specific color/pattern details if they exist
+            if (appearance.bayColor) {
+                appearanceString += ` (${appearance.bayColor})`;
+            }
+             if (appearance.chestnutColor) {
+                appearanceString += ` (${appearance.chestnutColor})`;
+            }
+             if (appearance.grayColor) {
+                appearanceString += ` (${appearance.grayColor})`;
+            }
+             if (appearance.dunDiluteColor) {
+                appearanceString += ` (${appearance.dunDiluteColor})`;
+            }
+             if (appearance.creamDiluteColor) {
+                appearanceString += ` (${appearance.creamDiluteColor})`;
+            }
+             if (appearance.champagneDiluteColor) {
+                appearanceString += ` (${appearance.champagneDiluteColor})`;
+            }
+             if (appearance.silverDiluteColor) {
+                appearanceString += ` (${appearance.silverDiluteColor})`;
+            }
+             if (appearance.diluteCombinationColor) {
+                appearanceString += ` (${appearance.diluteCombinationColor})`;
+            }
+             if (appearance.roanColor) {
+                appearanceString += ` (${appearance.roanColor})`;
+            }
+            if (appearance.patternType) {
+                appearanceString += `, Pattern Type: ${appearance.patternType}`;
+                if (appearance.basicPattern) {
+                    appearanceString += ` (${appearance.basicPattern})`;
+                }
+                 if (appearance.pintoPattern) {
+                    appearanceString += ` (${appearance.pintoPattern})`;
+                }
+                 if (appearance.appaloosaPattern) {
+                    appearanceString += ` (${appearance.appaloosaPattern})`;
+                }
+                 if (appearance.otherMarking) {
+                    appearanceString += ` (${appearance.otherMarking})`;
+                }
+            }
+            return appearanceString || 'Unknown Appearance';
+        }
+
+
+         // --- Recursive Appearance Logic (from second_code_canvas, adapted) ---
+         // This replaces the old queue-based appearance processing
+
+        function determineHorseAppearance() {
+            let appearance = {};
+            let currentInstruction = "Horse Appearance"; // Start with the main appearance table
+            const appearanceQueue = []; // Temporary queue for combination rolls
+
+            while(currentInstruction) {
+                let nextInstruction = null;
+
+                if (currentInstruction === "Horse Appearance") {
+                    const roll = rollDice(20);
+                    const result = rollOnTable(horseData.horseAppearance, roll);
+                    if (result) {
+                         // Store the main appearance result
+                        if (!appearance.color && !appearance.patternType) {
+                            // Only set the primary type if not already set by a previous roll/reroll
+                            if (result.result.includes("Horse Color")) {
+                                 appearance.color = result.result;
+                            } else if (result.result.includes("Horse Patterns")) {
+                                 appearance.patternType = result.result;
+                            } else {
+                                 // Direct color result
+                                 appearance.color = result.result;
+                            }
+                        } else {
+                            // If it's a reroll result, append it
+                             if (result.result.includes("Horse Color")) {
+                                appearance.color = (appearance.color ? appearance.color + ", " : "") + result.result;
+                            } else if (result.result.includes("Horse Patterns")) {
+                                appearance.patternType = (appearance.patternType ? appearance.patternType + ", " : "") + result.result;
+                            } else {
+                                 appearance.color = (appearance.color ? appearance.color + ", " : "") + result.result;
+                            }
+                        }
+
+
+                        if (result.next) {
+                            // If the result has a 'next' instruction, process the first one in the next iteration
+                            nextInstruction = result.next[0];
+                        }
+                    }
+                } else if (currentInstruction === "Horse Color (Bay)") {
+                     appearance.bayColor = determineBayColor();
+                     // Bay subtable doesn't lead to another table, so nextInstruction remains null
+                } else if (currentInstruction === "Horse Color (Chestnut)") {
+                     appearance.chestnutColor = determineChestnutColor();
+                     // Chestnut subtable doesn't lead to another table
+                } else if (currentInstruction === "Horse Color (Gray)") {
+                     const grayResult = determineGrayColor();
+                     appearance.grayColor = grayResult.color;
+                     if (grayResult.nextTable) {
+                         nextInstruction = grayResult.nextTable; // Could be Horse Appearance (reroll) or Horse Color (Roan)
+                     }
+                } else if (currentInstruction === "Horse Color (Dun Dilute)") {
+                    appearance.dunDiluteColor = determineDunDiluteColor();
+                } else if (currentInstruction === "Horse Color (Cream Dilute)") {
+                    appearance.creamDiluteColor = determineCreamDiluteColor();
+                } else if (currentInstruction === "Horse Color (Champagne Dilute)") {
+                    appearance.champagneDiluteColor = determineChampagneDiluteColor();
+                } else if (currentInstruction === "Horse Color (Silver Dilute)") {
+                    appearance.silverDiluteColor = determineSilverDiluteColor();
+                } else if (currentInstruction === "Horse Color (Dilute Combination)") {
+                    appearance.diluteCombinationColor = determineDiluteCombinationColor();
+                } else if (currentInstruction === "Horse Color (Roan)") {
+                     const roanResult = determineRoanColor();
+                     appearance.roanColor = roanResult.color;
+                     if (roanResult.nextTable) {
+                          nextInstruction = roanResult.nextTable; // Should be Horse Appearance (reroll)
+                     }
+                } else if (currentInstruction === "Horse Patterns Table (1D4)") {
+                    const patternResult = determineHorsePatterns();
+                    appearance.patternType = patternResult.type;
+                    if (patternResult.nextTable) {
+                        nextInstruction = patternResult.nextTable; // Leads to a specific pattern subtable
+                    }
+                } else if (currentInstruction === "Horse Basic Patterns") {
+                    const basicPatternResult = determineBasicPatterns();
+                    appearance.basicPattern = basicPatternResult.pattern;
+                     if (basicPatternResult.nextTable) {
+                         nextInstruction = basicPatternResult.nextTable; // Should be Horse Appearance (reroll)
+                     }
+                } else if (currentInstruction === "Horse Pinto Patterns") {
+                     const pintoPatternResult = determinePintoPatterns();
+                     appearance.pintoPattern = pintoPatternResult.pattern;
+                     if (pintoPatternResult.nextTable) {
+                         // Handle combination rolls like "Pinto, Appaloosa, and Appearance Subtables"
+                         if (pintoPatternResult.nextTable.includes("Subtables")) {
+                             const parts = pintoPatternResult.nextTable.replace(" Subtables", "").split(", and ");
+                             // Add each part as a new instruction to be processed in the next loop iterations
+                             parts.reverse().forEach(part => { // Add in reverse order to process in correct sequence
+                                  if (part === "Pinto") part = "Horse Pinto Patterns"; // Re-add full name
+                                  if (part === "Appaloosa") part = "Horse Appaloosa Patterns"; // Re-add full name
+                                  if (part === "Appearance") part = "Horse Appearance"; // Re-add full name
+                                  // Add to the front of the queue to process immediately
+                                  appearanceQueue.unshift(part);
+                             });
+                             currentInstruction = null; // Break the current appearance loop
+                         } else {
+                              nextInstruction = pintoPatternResult.nextTable; // Could be another pattern table or Appearance
+                         }
+                     }
+                } else if (currentInstruction === "Horse Appaloosa Patterns") {
+                    const appaloosaPatternResult = determineAppaloosaPatterns();
+                    appearance.appaloosaPattern = appaloosaPatternResult.pattern;
+                     if (appaloosaPatternResult.nextTable) {
+                          // Handle combination rolls like "Appaloosa, Pinto, and Appearance Subtables"
+                         if (appaloosaPatternResult.nextTable.includes("Subtables")) {
+                             const parts = appaloosaPatternResult.nextTable.replace(" Subtables", "").split(", and ");
+                             // Add each part as a new instruction to be processed in the next loop iterations
+                             parts.reverse().forEach(part => { // Add in reverse order to process in correct sequence
+                                  if (part === "Pinto") part = "Horse Pinto Patterns"; // Re-add full name
+                                  if (part === "Appaloosa") part = "Horse Appaloosa Patterns"; // Re-add full name
+                                  if (part === "Appearance") part = "Horse Appearance"; // Re-add full name
+                                  appearanceQueue.unshift(part);
+                             });
+                             currentInstruction = null; // Break the current appearance loop
+                         } else {
+                            nextInstruction = appaloosaPatternResult.nextTable; // Could be another pattern table or Appearance
+                         }
+                     }
+                } else if (currentInstruction === "Horse Other Markings") {
+                     const otherMarkingResult = determineOtherMarkings();
+                     appearance.otherMarking = otherMarkingResult.marking;
+                     if (otherMarkingResult.nextTable) {
+                         nextInstruction = otherMarkingResult.nextTable; // Should be Horse Appearance (reroll)
+                     }
+                } else {
+                    if (debug) console.warn("Unknown appearance instruction:", currentInstruction);
+                    currentInstruction = null; // Stop the loop if instruction is not recognized
+                }
+
+                if (currentInstruction !== null) { // Only update currentInstruction if it wasn't set to null by a combination roll
+                    currentInstruction = nextInstruction;
+                } else {
+                     // If currentInstruction was set to null (by a combination roll), break the loop
+                     break;
+                }
+            }
+
+             // Process any instructions added to the appearance queue by combination rolls
+             while(appearanceQueue.length > 0) {
+                 const instructionFromQueue = appearanceQueue.shift();
+                 // Re-run the appearance logic for these instructions
+                 const subsequentAppearance = determineHorseAppearanceRecursive(instructionFromQueue); // Call a helper for recursive processing
+
+                 // Merge the results back into the main appearance object
+                 if (subsequentAppearance.color) appearance.color = (appearance.color ? appearance.color + ", " : "") + subsequentAppearance.color;
+                 if (subsequentAppearance.bayColor) appearance.bayColor = (subsequentAppearance.bayColor ? subsequentAppearance.bayColor + ", " : "") + subsequentAppearance.bayColor;
+                 if (subsequentAppearance.chestnutColor) appearance.chestnutColor = (subsequentAppearance.chestnutColor ? subsequentAppearance.chestnutColor + ", " : "") + subsequentAppearance.chestnutColor;
+                 if (subsequentAppearance.grayColor) appearance.grayColor = (subsequentAppearance.grayColor ? subsequentAppearance.grayColor + ", " : "") + subsequentAppearance.grayColor;
+                 if (subsequentAppearance.dunDiluteColor) appearance.dunDiluteColor = (subsequentAppearance.dunDiluteColor ? subsequentAppearance.dunDiluteColor + ", " : "") + subsequentAppearance.dunDiluteColor;
+                 if (subsequentAppearance.creamDiluteColor) appearance.creamDiluteColor = (subsequentAppearance.creamDiluteColor ? subsequentAppearance.creamDiluteColor + ", " : "") + subsequentAppearance.creamDiluteColor;
+                 if (subsequentAppearance.champagneDiluteColor) appearance.champagneDiluteColor = (subsequentAppearance.champagneDiluteColor ? subsequentAppearance.champagneDiluteColor + ", " : "") + subsequentAppearance.champagneDiluteColor;
+                 if (subsequentAppearance.silverDiluteColor) appearance.silverDiluteColor = (subsequentAppearance.silverDiluteColor ? subsequentAppearance.silverDiluteColor + ", " : "") + subsequentAppearance.silverDiluteColor;
+                 if (subsequentAppearance.diluteCombinationColor) appearance.diluteCombinationColor = (subsequentAppearance.diluteCombinationColor ? subsequentAppearance.diluteCombinationColor + ", " : "") + subsequentAppearance.diluteCombinationColor;
+                 if (subsequentAppearance.roanColor) appearance.roanColor = (subsequentAppearance.roanColor ? subsequentAppearance.roanColor + ", " : "") + subsequentAppearance.roanColor;
+
+                 if (subsequentAppearance.patternType) {
+                      appearance.patternType = (subsequentAppearance.patternType ? subsequentAppearance.patternType + ", " : "") + subsequentAppearance.patternType;
+                      if (subsequentAppearance.basicPattern) appearance.basicPattern = (subsequentAppearance.basicPattern ? subsequentAppearance.basicPattern + ", " : "") + subsequentAppearance.basicPattern;
+                      if (subsequentAppearance.pintoPattern) appearance.pintoPattern = (subsequentAppearance.pintoPattern ? subsequentAppearance.pintoPattern + ", " : "") + subsequentAppearance.pintoPattern;
+                      if (subsequentAppearance.appaloosaPattern) appearance.appaloosaPattern = (subsequentAppearance.appaloosaPattern ? subsequentAppearance.appaloosaPattern + ", " : "") + subsequentAppearance.appaloosaPattern;
+                      if (subsequentAppearance.otherMarking) appearance.otherMarking = (subsequentAppearance.otherMarking ? subsequentAppearance.otherMarking + ", " : "") + subsequentAppearance.otherMarking;
+                 }
+             }
+
+
+            return appearance;
+        }
+
+        // Helper function for recursive appearance processing from combination rolls
+        function determineHorseAppearanceRecursive(instruction) {
+             let appearance = {};
+             let currentInstruction = instruction;
+
+             while(currentInstruction) {
+                 let nextInstruction = null;
+
+                 if (currentInstruction === "Horse Appearance") {
+                    const roll = rollDice(20);
+                    const result = rollOnTable(horseData.horseAppearance, roll);
+                    if (result) {
+                         if (result.result.includes("Horse Color")) {
+                              appearance.color = result.result;
+                         } else if (result.result.includes("Horse Patterns")) {
+                              appearance.patternType = result.result;
+                         } else {
+                              appearance.color = result.result;
+                         }
+
+                        if (result.next) {
+                            nextInstruction = result.next[0];
+                        }
+                    }
+                } else if (currentInstruction === "Horse Color (Bay)") {
+                     appearance.bayColor = determineBayColor();
+                } else if (currentInstruction === "Horse Color (Chestnut)") {
+                     appearance.chestnutColor = determineChestnutColor();
+                } else if (currentInstruction === "Horse Color (Gray)") {
+                     const grayResult = determineGrayColor();
+                     appearance.grayColor = grayResult.color;
+                     if (grayResult.nextTable) {
+                         nextInstruction = grayResult.nextTable;
+                     }
+                } else if (currentInstruction === "Horse Color (Dun Dilute)") {
+                    appearance.dunDiluteColor = determineDunDiluteColor();
+                } else if (currentInstruction === "Horse Color (Cream Dilute)") {
+                    appearance.creamDiluteColor = determineCreamDiluteColor();
+                } else if (currentInstruction === "Horse Color (Champagne Dilute)") {
+                    appearance.champagneDiluteColor = determineChampagneDiluteColor();
+                } else if (currentInstruction === "Horse Color (Silver Dilute)") {
+                    appearance.silverDiluteColor = determineSilverDiluteColor();
+                } else if (currentInstruction === "Horse Color (Dilute Combination)") {
+                    appearance.diluteCombinationColor = determineDiluteCombinationColor();
+                } else if (currentInstruction === "Horse Color (Roan)") {
+                     const roanResult = determineRoanColor();
+                     appearance.roanColor = roanResult.color;
+                     if (roanResult.nextTable) {
+                          nextInstruction = roanResult.nextTable;
+                     }
+                } else if (currentInstruction === "Horse Patterns Table (1D4)") {
+                    const patternResult = determineHorsePatterns();
+                    appearance.patternType = patternResult.type;
+                    if (patternResult.nextTable) {
+                        nextInstruction = patternResult.nextTable;
+                    }
+                } else if (currentInstruction === "Horse Basic Patterns") {
+                    const basicPatternResult = determineBasicPatterns();
+                    appearance.basicPattern = basicPatternResult.pattern;
+                     if (basicPatternResult.nextTable) {
+                         nextInstruction = basicPatternResult.nextTable;
+                     }
+                } else if (currentInstruction === "Horse Pinto Patterns") {
+                     const pintoPatternResult = determinePintoPatterns();
+                     appearance.pintoPattern = pintoPatternResult.pattern;
+                     if (pintoPatternResult.nextTable && !pintoPatternResult.nextTable.includes("Subtables")) {
+                         nextInstruction = pintoPatternResult.nextTable;
+                     }
+                } else if (currentInstruction === "Horse Appaloosa Patterns") {
+                    const appaloosaPatternResult = determineAppaloosaPatterns();
+                    appearance.appaloosaPattern = appaloosaPatternResult.pattern;
+                     if (appaloosaPatternResult.nextTable && !appaloosaPatternResult.nextTable.includes("Subtables")) {
+                         nextInstruction = appaloosaPatternResult.nextTable;
+                     }
+                } else if (currentInstruction === "Horse Other Markings") {
+                     const otherMarkingResult = determineOtherMarkings();
+                     appearance.otherMarking = otherMarkingResult.marking;
+                     if (otherMarkingResult.nextTable) {
+                         nextInstruction = otherMarkingResult.nextTable;
+                     }
+                } else {
+                    if (debug) console.warn("Unknown recursive appearance instruction:", currentInstruction);
+                    currentInstruction = null;
+                }
+                 currentInstruction = nextInstruction;
+             }
+             return appearance;
+        }
+
+
+        // --- Determine Horse Traits (Updated to use recursive helpers) ---
+        function determineHorseTraits(table) {
+            const roll = rollDice(100);
+            let badTraits = [];
+            let goodTraits = [];
+            let neutralTraits = [];
+            let costModifier = 'Normal';
+
+            let result = null;
+            if (table === 'Horse Traits (Young)') {
+                result = rollOnTable(horseData.horseTraitsYoung, roll);
+            } else if (table === 'Horse Traits (Adult)') {
+                result = rollOnTable(horseData.horseTraitsAdult, roll);
+            } else if (table === 'Horse Traits (Old)') {
+                result = rollOnTable(horseData.horseTraitsOld, roll);
+            }
+
+            if (result) {
+                costModifier = result.cost;
+                const instructions = result.result.split(', '); // Split instructions like "Bad Traits Subtable, Neutral Traits Subtable"
+
+                instructions.forEach(instruction => {
+                     if (instruction === "Bad Traits Subtable" || instruction === "2x Bad Traits Subtable") {
+                         const numRolls = instruction === "2x Bad Traits Subtable" ? 2 : 1;
+                         for(let i = 0; i < numRolls; i++) {
+                             const trait = getBadTrait();
+                              if (trait) { // getBadTrait returns null if it rolls on Neutral, otherwise returns a trait string or array
+                                  if (Array.isArray(trait)) {
+                                      // If getBadTrait recursively called Neutral and Neutral recursively called Good (Good x2)
+                                      goodTraits.push(...trait.filter(t => t !== null));
+                                  } else {
+                                      badTraits.push(trait);
+                                  }
+                              }
+                         }
+                     } else if (instruction === "Neutral Traits Subtable" || instruction === "2x Neutral Traits Subtable") {
+                         const numRolls = instruction === "2x Neutral Traits Subtable" ? 2 : 1;
+                         for(let i = 0; i < numRolls; i++) {
+                              const trait = getNeutralTrait(); // getNeutralTrait returns null if it rolls on Good, otherwise returns a trait string or array
+                              if (Array.isArray(trait)) {
+                                  // If getNeutralTrait recursively called Good (Good x2)
+                                  goodTraits.push(...trait.filter(t => t !== null));
+                              } else if (trait) {
+                                 neutralTraits.push(trait); // Add the single neutral trait
+                              }
+                         }
+                     } else if (instruction === "Good Traits Subtable" || instruction === "2x Good Traits Subtable") {
+                         const numRolls = instruction === "2x Good Traits Subtable" ? 2 : 1;
+                         for(let i = 0; i < numRolls; i++) {
+                             const traitResult = getGoodTrait(); // This can return a single trait string or an array of trait strings
+                             if (Array.isArray(traitResult)) {
+                                 goodTraits.push(...traitResult.filter(t => t !== null)); // Add all traits from the array (from Good Traits x2)
+                             } else if (traitResult) {
+                                 goodTraits.push(traitResult); // Add the single trait string
+                             }
+                         }
+                     }
+                });
+
+                 // Handle 'Knows Trick' trait and add specific trick
+                 for (let i = 0; i < goodTraits.length; i++) {
+                     if (goodTraits[i] === 'Knows Trick') {
+                         goodTraits[i] = `Knows Trick (${getHorseTrick()})`;
+                     }
+                 }
+
+            }
+
+
+            return { badTraits, goodTraits, neutralTraits, costModifier };
+        }
+
+
+        // --- Name Generation (Adapt as needed) ---
+        // The DOCX doesn't seem to have a name generation table like the drink generator.
+        // You might want to create one or use a simple naming convention.
+        function generateHorseName(generatedAttributes) {
+            // Example: Combine type and a random adjective
+            const type = generatedAttributes["Mount Type"] || "Horse";
+            const adjectives = ["Noble", "Sturdy", "Swift", "Wild", "Gentle", "Brave", "Loyal", "Fearless", "Mighty", "Quick", "Shining", "Dark"]; // Example adjectives
+            const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+
+            // You could also incorporate color or pattern into the name
+            const appearance = generatedAttributes["Appearance"] || {}; // Use empty object if appearance is null
+            let appearanceAdjective = "";
+
+            // Check specific color/pattern properties for naming
+            if (appearance.color && appearance.color.includes("Jet Black")) appearanceAdjective = "Shadow";
+            else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Golden Palomino")) appearanceAdjective = "Golden";
+            else if (appearance.roanColor && appearance.roanColor.includes("Strawberry Roan")) appearanceAdjective = "Strawberry";
+             else if (appearance.roanColor && appearance.roanColor.includes("Blue Roan")) appearanceAdjective = "Azure";
+             else if (appearance.roanColor && appearance.roanColor.includes("Red Roan")) appearanceAdjective = "Crimson";
+             else if (appearance.roanColor && appearance.roanColor.includes("Lilac Roan")) appearanceAdjective = "Lilac";
+             else if (appearance.roanColor && appearance.roanColor.includes("Honey Roan")) appearanceAdjective = "Honey";
+             else if (appearance.bayColor && appearance.bayColor.includes("Blood Bay")) appearanceAdjective = "Blood";
+             else if (appearance.bayColor && appearance.bayColor.includes("Copper Bay")) appearanceAdjective = "Copper";
+             else if (appearance.bayColor && appearance.bayColor.includes("Dark Bay")) appearanceAdjective = "Dark";
+             else if (appearance.bayColor && appearance.bayColor.includes("Gold Bay")) appearanceAdjective = "Gold";
+             else if (appearance.bayColor && appearance.bayColor.includes("Mahogany Bay")) appearanceAdjective = "Mahogany";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Sorrel")) appearanceAdjective = "Sorrel";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Liver Chestnut")) appearanceAdjective = "Liver";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Cherry Chestnut")) appearanceAdjective = "Cherry";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Golden Chestnut")) appearanceAdjective = "Golden";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Honey Chestnut")) appearanceAdjective = "Honey";
+             else if (appearance.chestnutColor && appearance.chestnutColor.includes("Black Chestnut")) appearanceAdjective = "Black";
+             else if (appearance.grayColor && appearance.grayColor.includes("Dapple Gray")) appearanceAdjective = "Dapple";
+             else if (appearance.grayColor && appearance.grayColor.includes("Rose Gray")) appearanceAdjective = "Rose";
+             else if (appearance.grayColor && appearance.grayColor.includes("Iron Gray")) appearanceAdjective = "Iron";
+             else if (appearance.grayColor && appearance.grayColor.includes("Dark Gray")) appearanceAdjective = "Dark";
+             else if (appearance.grayColor && appearance.grayColor.includes("Mulberry Gray")) appearanceAdjective = "Mulberry";
+             else if (appearance.grayColor && appearance.grayColor.includes("White Gray")) appearanceAdjective = "White";
+             else if (appearance.grayColor && appearance.grayColor.includes("Fleabitten Gray")) appearanceAdjective = "Fleabitten";
+             else if (appearance.grayColor && appearance.grayColor.includes("Watermark Gray")) appearanceAdjective = "Watermark";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Peach Dun")) appearanceAdjective = "Peach";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Red Dun")) appearanceAdjective = "Red";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Copper Dun")) appearanceAdjective = "Copper";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Bronze Dun")) appearanceAdjective = "Bronze";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Liver Dun")) appearanceAdjective = "Liver";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Classic Dun")) appearanceAdjective = "Classic";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Buttermilk Dun")) appearanceAdjective = "Buttermilk";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Slate Dun")) appearanceAdjective = "Slate";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Blue Dun")) appearanceAdjective = "Blue";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Silver Dun")) appearanceAdjective = "Silver";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Coyote Dun")) appearanceAdjective = "Coyote";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Wolf Dun")) appearanceAdjective = "Wolf";
+             else if (appearance.dunDiluteColor && appearance.dunDiluteColor.includes("Olive Dun")) appearanceAdjective = "Olive";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Caramel Palomino")) appearanceAdjective = "Caramel";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Cremello")) appearanceAdjective = "Cremello";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Smoky Black")) appearanceAdjective = "Smoky";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Smoky Cream")) appearanceAdjective = "Smoky Cream";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Buckskin")) appearanceAdjective = "Buckskin";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Buttermilk Buckskin")) appearanceAdjective = "Buttermilk Buckskin";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Golden Buckskin")) appearanceAdjective = "Golden Buckskin";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Bronze Buckskin")) appearanceAdjective = "Bronze Buckskin";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Perlino")) appearanceAdjective = "Perlino";
+             else if (appearance.creamDiluteColor && appearance.creamDiluteColor.includes("Black Buckskin")) appearanceAdjective = "Black Buckskin";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Yellow Dun")) appearanceAdjective = "Yellow Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Cream Dun")) appearanceAdjective = "Cream Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Gold Cream")) appearanceAdjective = "Gold Cream";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Ivory Champagne")) appearanceAdjective = "Ivory Champagne";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Gold Dun")) appearanceAdjective = "Gold Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Smoky Black Dun")) appearanceAdjective = "Smoky Black Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Smoky Cream Grulla")) appearanceAdjective = "Smoky Cream Grulla";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Silver Smoky Black")) appearanceAdjective = "Silver Smoky Black";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Smoky Black Champagne")) appearanceAdjective = "Smoky Black Champagne";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Classic Dun Champagne")) appearanceAdjective = "Classic Dun Champagne";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Silver Dapple Grulla")) appearanceAdjective = "Silver Dapple Grulla";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Classic Silver")) appearanceAdjective = "Classic Silver";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Silver Dapple Smoky Grulla")) appearanceAdjective = "Silver Dapple Smoky Grulla";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Dunskin")) appearanceAdjective = "Dunskin";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Dun Perlino")) appearanceAdjective = "Dun Perlino";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Silver Buckskin")) appearanceAdjective = "Silver Buckskin";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Amber Cream")) appearanceAdjective = "Amber Cream";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Amber Dun")) appearanceAdjective = "Amber Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Amber Silver")) appearanceAdjective = "Amber Silver";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Brown Dunskin")) appearanceAdjective = "Brown Dunskin";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Sable Cream")) appearanceAdjective = "Sable Cream";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Sable Dun")) appearanceAdjective = "Sable Dun";
+             else if (appearance.diluteCombinationColor && appearance.diluteCombinationColor.includes("Pearl")) appearanceAdjective = "Pearl";
+             else if (appearance.silverDiluteColor && appearance.silverDiluteColor.includes("Silver Dapple")) appearanceAdjective = "Silver Dapple";
+             else if (appearance.silverDiluteColor && appearance.silverDiluteColor.includes("Chocolate Silver")) appearanceAdjective = "Chocolate Silver";
+             else if (appearance.silverDiluteColor && appearance.silverDiluteColor.includes("Red Silver")) appearanceAdjective = "Red Silver";
+             else if (appearance.silverDiluteColor && appearance.silverDiluteColor.includes("Blue Silver")) appearanceAdjective = "Blue Silver";
+             else if (appearance.basicPattern && appearance.basicPattern.includes("Brindle")) appearanceAdjective = "Brindle";
+             else if (appearance.basicPattern && appearance.basicPattern.includes("Reverse Brindle")) appearanceAdjective = "Reverse Brindle";
+             else if (appearance.otherMarking && appearance.otherMarking.includes("Manchado")) appearanceAdjective = "Manchado";
+
+
+            if (appearanceAdjective && Math.random() < 0.6) { // Higher chance to use an appearance adjective
+                 return `${appearanceAdjective} ${type}`;
+            }
+
+
+            return `${randomAdjective} ${type}`;
+        }
+
+
+        // --- Saved Horses Logic (Adapt from initial_code_canvas) ---
+
+        const savedHorses = []; // Global array for saved horses
+
+        document.getElementById("saveHorse").addEventListener("click", () => {
+            // Get current horse details from the displayed output
+            const horseName = document.getElementById("horseName").textContent;
+            const gender = document.getElementById("gender").textContent;
+            const mountType = document.getElementById("mountType").textContent;
+            const appearance = document.getElementById("appearance").textContent;
+            const age = document.getElementById("age").textContent;
+            const traitsHTML = document.getElementById("traits").innerHTML; // Get innerHTML to preserve formatting
+            const costModifier = document.getElementById("costModifier").textContent;
+            const calculatedCost = document.getElementById("calculatedCost").textContent;
+            const statBlockHTML = document.getElementById("statBlockOutput").innerHTML;
+
+
+            if (!horseName.trim() || horseName.includes("Generated Attributes:")) { // Add a check for placeholder name
+                alert("Please generate a horse before saving!");
+                return;
+            }
+
+            // Compile horse details into a single string, using <br> for new lines in the saved list
+            const horseDetails = `<strong>${horseName}</strong><br>
+                Gender: ${gender}<br>
+                Mount Type: ${mountType}<br>
+                Appearance: ${appearance}<br>
+                Age: ${age}<br>
+                Traits: ${traitsHTML}<br>
+                Cost Modifier: ${costModifier}<br>
+                Calculated Cost: ${calculatedCost}<br>
+                ${statBlockHTML} `; // Include stat block HTML in saved details
+
+
+            // Check for duplicate horses in the savedHorses array (basic string comparison)
+            if (savedHorses.some(horse => horse === horseDetails)) {
+                alert("This horse has already been saved!");
+                return;
+            }
+
+            // Add the horse to the savedHorses array
+            savedHorses.push(horseDetails);
+
+
+            // Update the saved horses list on-screen
+            const listItem = document.createElement("li");
+            listItem.innerHTML = horseDetails; // Use the compiled horseDetails with HTML
+            listItem.style.marginBottom = "10px";
+            document.getElementById("savedHorsesList").appendChild(listItem);
+        });
+
+        document.getElementById("downloadList").addEventListener("click", () => {
+            if (savedHorses.length === 0) {
+                alert("No horses saved to download!");
+                return;
+            }
+
+            // Compile saved horses into a text file, replacing <br> with newlines for the text file
+            // Need to convert HTML in traits and stat block back to readable text for the download
+            const textContent = savedHorses.map(horse => {
+                 let plainTextHorse = horse.replace(/<br>/g, '\n').replace(/<strong>(.*?)<\/strong>/g, '$1'); // Basic replacements
+
+                 // More complex replacements for traits and stat block HTML
+                 plainTextHorse = plainTextHorse.replace(/<p><strong>Traits:<\/strong>.*?<\/p>/s, 'Traits:\n'); // Remove Traits label HTML
+                 plainTextHorse = plainTextHorse.replace(/<p><strong>Stat Block Traits:<\/strong>.*?<\/p>/s, 'Stat Block Traits:\n'); // Remove Stat Block Traits label HTML
+                 plainTextHorse = plainTextHorse.replace(/<p><strong>Actions:<\/strong>.*?<\/p>/s, 'Actions:\n'); // Remove Actions label HTML
+
+                 // Replace list items (li) with bullet points and newline
+                 plainTextHorse = plainTextHorse.replace(/<li><em>(.*?)<\/em>\. (.*?)<\/li>/g, '  - $1. $2\n'); // For stat block traits/actions
+                 plainTextHorse = plainTextHorse.replace(/<p><strong>(.*?)<\/strong>(?: \(Trainable: (.*?)\))?(?: - (.*?))?<\/p>/g, '  - $1${$2 ? " (Trainable: " + $2 + ")" : ""}${$3 ? " - " + $3 : ""}\n'); // For generated traits
+
+                 // Remove remaining HTML tags
+                 plainTextHorse = plainTextHorse.replace(/<[^>]*>/g, '');
+
+                 return plainTextHorse;
+
+            }).join("\n---\n"); // Separate horses with a line
+
+            const blob = new Blob([textContent], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+            link.download = `horse_list_${timestamp}.txt`;
+            link.click();
+        });
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("generate-horse").addEventListener("click", generateHorse);
+            document.getElementById("saveHorse").addEventListener("click", saveHorse); // Assuming saveHorse is defined
+            document.getElementById("downloadList").addEventListener("click", downloadList); // Assuming downloadList is defined
+        });
+
+
+    </script>
+</body>
+</html>
